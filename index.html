@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSP - Last Second Preparation | O Levels Vault</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body x-data="lspApp()" x-init="init()" :class="darkMode ? 'dark bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-800'" class="min-h-screen transition-colors duration-300 font-sans">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/30">
+                    L
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent">LSP</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Last Second Preparation</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="hidden md:flex space-x-1">
+                <button @click="currentTab = 'vault'" :class="currentTab === 'vault' ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-3 py-2 rounded-lg text-sm transition"><i class="fa-solid fa-vault mr-1.5"></i> Vault</button>
+                <button @click="currentTab = 'questions'" :class="currentTab === 'questions' ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-3 py-2 rounded-lg text-sm transition"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Question Bank</button>
+                <button @click="currentTab = 'oneliners'" :class="currentTab === 'oneliners' ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-3 py-2 rounded-lg text-sm transition"><i class="fa-solid fa-bolt mr-1.5"></i> One-Liners</button>
+                <button @click="currentTab = 'ebooks'" :class="currentTab === 'ebooks' ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-3 py-2 rounded-lg text-sm transition"><i class="fa-solid fa-book-bookmark mr-1.5"></i> e-Books & Papers</button>
+                <button @click="currentTab = 'advisor'" :class="currentTab === 'advisor' ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-3 py-2 rounded-lg text-sm transition"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> AI Focus Advisor</button>
+            </nav>
+
+            <!-- Right Controls: Profile & Dark Mode -->
+            <div class="flex items-center space-x-3">
+                <!-- Profile Pill -->
+                <div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full p-1 text-xs font-medium border border-slate-200 dark:border-slate-700">
+                    <button @click="profileType = 'school'; saveProfile();" :class="profileType === 'school' ? 'bg-indigo-600 text-white shadow' : 'text-slate-600 dark:text-slate-400'" class="px-2.5 py-1 rounded-full transition">School</button>
+                    <button @click="profileType = 'private'; saveProfile();" :class="profileType === 'private' ? 'bg-indigo-600 text-white shadow' : 'text-slate-600 dark:text-slate-400'" class="px-2.5 py-1 rounded-full transition">Private</button>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <button @click="toggleDarkMode()" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i :class="darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-slate-600'" class="fa-solid text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-50 flex justify-around p-2 shadow-lg">
+        <button @click="currentTab = 'vault'" :class="currentTab === 'vault' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'" class="flex flex-col items-center text-xs"><i class="fa-solid fa-vault text-base mb-0.5"></i>Vault</button>
+        <button @click="currentTab = 'questions'" :class="currentTab === 'questions' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'" class="flex flex-col items-center text-xs"><i class="fa-solid fa-clipboard-question text-base mb-0.5"></i>Questions</button>
+        <button @click="currentTab = 'oneliners'" :class="currentTab === 'oneliners' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'" class="flex flex-col items-center text-xs"><i class="fa-solid fa-bolt text-base mb-0.5"></i>Notes</button>
+        <button @click="currentTab = 'ebooks'" :class="currentTab === 'ebooks' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'" class="flex flex-col items-center text-xs"><i class="fa-solid fa-book text-base mb-0.5"></i>e-Books</button>
+        <button @click="currentTab = 'advisor'" :class="currentTab === 'advisor' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'" class="flex flex-col items-center text-xs"><i class="fa-solid fa-wand-magic-sparkles text-base mb-0.5"></i>Advisor</button>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
+
+        <!-- TAB 1: VAULT (Subject Catalog & Dashboard) -->
+        <div x-show="currentTab === 'vault'" x-transition.opacity>
+            <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">O Levels Subject Catalog</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Select a subject to filter your past papers, questions, and e-books instantly.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select x-model="selectedSubjectFilter" class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="ALL">All Subjects</option>
+                        <template x-for="sub in subjects" :key="sub.code">
+                            <option :value="sub.code" x-text="sub.name + ' (' + sub.code + ')'"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Subject Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <template x-for="subject in subjects" :key="subject.code">
+                    <div @click="selectedSubjectFilter = subject.code; currentTab = 'questions'" class="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-indigo-500 dark:hover:border-indigo-500 transition cursor-pointer group">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition">
+                                <i :class="subject.icon"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" x-text="subject.code"></span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition" x-text="subject.name"></h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4" x-text="subject.category"></p>
+                        
+                        <!-- Quick Stats -->
+                        <div class="flex items-center justify-between text-xs pt-3 border-t border-slate-100 dark:border-slate-700/50 text-slate-500 dark:text-slate-400">
+                            <span x-text="getSubjectQuestionCount(subject.code) + ' Questions Saved'"></span>
+                            <span class="text-indigo-600 dark:text-indigo-400 font-medium group-hover:translate-x-1 transition">Open Vault &rarr;</span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 2: QUESTION BANK -->
+        <div x-show="currentTab === 'questions'" x-transition.opacity>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Question Bank & Archive</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Snap tricky past paper questions, compress them, and store them with occurrences.</p>
+                </div>
+                <button @click="openAddQuestionModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-xl text-sm shadow-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Add Question
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl mb-6 flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <input type="text" x-model="questionSearch" placeholder="Search keywords or topics..." class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full md:w-64">
+                    <select x-model="selectedSubjectFilter" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="ALL">All Subjects</option>
+                        <template x-for="sub in subjects" :key="sub.code">
+                            <option :value="sub.code" x-text="sub.name"></option>
+                        </template>
+                    </select>
+                </div>
+                <div class="text-xs text-slate-500 dark:text-slate-400" x-text="'Showing ' + filteredQuestions.length + ' questions'"></div>
+            </div>
+
+            <!-- Questions List -->
+            <div class="space-y-4">
+                <template x-for="q in filteredQuestions" :key="q.id">
+                    <div class="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400" x-text="q.subjectCode"></span>
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" x-text="'Year: ' + q.year"></span>
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400" x-text="'Occurrences: ' + q.occurrences"></span>
+                                </div>
+                                <h3 class="font-bold text-base" x-text="q.title"></h3>
+                            </div>
+                            <button @click="deleteQuestion(q.id)" class="text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mb-4 whitespace-pre-line" x-text="q.notes"></p>
+
+                        <!-- Attached Image if present -->
+                        <template x-if="q.image">
+                            <div class="mb-4">
+                                <img :src="q.image" class="max-h-60 rounded-xl border border-slate-200 dark:border-slate-700 object-cover">
+                            </div>
+                        </template>
+
+                        <!-- Linked E-book / Paper Reference -->
+                        <template x-if="q.linkedPaper">
+                            <div class="text-xs bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 p-2.5 rounded-xl flex items-center justify-between">
+                                <span class="font-medium text-slate-600 dark:text-slate-400"><i class="fa-solid fa-link mr-1.5 text-indigo-500"></i> Linked Resource: <strong class="text-slate-800 dark:text-slate-200" x-text="q.linkedPaper"></strong></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template x-if="filteredQuestions.length === 0">
+                    <div class="text-center py-12 bg-white dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">No questions found in this vault yet.</p>
+                        <button @click="openAddQuestionModal = true" class="mt-3 text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline">Add your first question &rarr;</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 3: ONE-LINERS -->
+        <div x-show="currentTab === 'oneliners'" x-transition.opacity>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">One-Liner Study Points</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">High-yield revision facts and definitions for last-second cramming.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select x-model="selectedSubjectFilter" class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="ALL">All Subjects</option>
+                        <template x-for="sub in subjects" :key="sub.code">
+                            <option :value="sub.code" x-text="sub.name"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <template x-for="item in filteredOneLiners" :key="item.id">
+                    <div class="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400" x-text="item.subjectCode"></span>
+                                <span class="text-xs text-slate-400" x-text="item.topic"></span>
+                            </div>
+                            <p class="text-sm font-medium text-slate-800 dark:text-slate-200 mb-3" x-text="item.text"></p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700/50 text-xs text-slate-500">
+                            <span>High-Yield Fact</span>
+                            <button @click="toggleBookmarkOneLiner(item.id)" :class="item.bookmarked ? 'text-amber-500' : 'text-slate-400 hover:text-amber-500'" class="transition"><i class="fa-solid fa-bookmark text-sm"></i></button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 4: E-BOOKS & PAST PAPER REPOSITORY -->
+        <div x-show="currentTab === 'ebooks'" x-transition.opacity>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">e-Books & Past Paper Repository</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Upload and organize your syllabus books, past papers, and marking schemes.</p>
+                </div>
+                <button @click="openAddEbookModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-xl text-sm shadow-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Document
+                </button>
+            </div>
+
+            <!-- E-Books Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <template x-for="book in ebooks" :key="book.id">
+                    <div class="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-file-pdf text-lg"></i>
+                                </div>
+                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" x-text="book.subjectCode"></span>
+                            </div>
+                            <h3 class="font-bold text-base mb-1" x-text="book.title"></h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3" x-text="'Type: ' + book.docType"></p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700/50">
+                            <span class="text-xs text-slate-400" x-text="book.filename || 'Local File'"></span>
+                            <div class="flex items-center gap-2">
+                                <button @click="deleteEbook(book.id)" class="text-slate-400 hover:text-red-500 text-xs transition"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="ebooks.length === 0">
+                    <div class="col-span-full text-center py-12 bg-white dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                        <i class="fa-solid fa-book-open-reader text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">No e-books or past papers uploaded yet.</p>
+                        <button @click="openAddEbookModal = true" class="mt-3 text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline">Upload your first document &rarr;</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 5: AI FOCUS ADVISOR -->
+        <div x-show="currentTab === 'advisor'" x-transition.opacity>
+            <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold">LSP AI Focus Advisor</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" x-text="'Optimized for O Levels (' + profileType.toUpperCase() + ' Student)'"></p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div class="bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 p-4 rounded-2xl">
+                        <h4 class="font-bold text-sm text-indigo-700 dark:text-indigo-300 mb-1"><i class="fa-solid fa-lightbulb mr-1.5"></i> Today's Last-Second Strategy</h4>
+                        <p class="text-xs text-indigo-600/80 dark:text-indigo-300/80" x-text="aiAdviceText"></p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" x-model="aiQuery" placeholder="Ask for a revision plan or topic summary..." class="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button @click="generateAiAdvice()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Ask AI</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: ADD QUESTION -->
+    <div x-show="openAddQuestionModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" x-transition.opacity>
+        <div @click.outside="openAddQuestionModal = false" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold mb-4">Add Question to Vault</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Subject</label>
+                    <select x-model="newQ.subjectCode" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                        <template x-for="sub in subjects" :key="sub.code">
+                            <option :value="sub.code" x-text="sub.name + ' (' + sub.code + ')'"></option>
+                        </template>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Question Title / Topic</label>
+                    <input type="text" x-model="newQ.title" placeholder="e.g., Circle Theorems Hard Question" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Year / Session</label>
+                        <input type="text" x-model="newQ.year" placeholder="e.g., May/June 2024" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Occurrences</label>
+                        <input type="number" x-model="newQ.occurrences" value="1" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Snap / Upload Image (Compressed)</label>
+                    <input type="file" accept="image/*" @change="handleImageUpload($event)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-950 file:text-indigo-600 dark:file:text-indigo-400 hover:file:bg-indigo-100 cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Notes / Solution Steps</label>
+                    <textarea x-model="newQ.notes" rows="3" placeholder="Key trick or marking scheme point..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Link to Past Paper / E-book</label>
+                    <select x-model="newQ.linkedPaper" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                        <option value="">-- None --</option>
+                        <template x-for="b in ebooks" :key="b.id">
+                            <option :value="b.title" x-text="b.title"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button @click="openAddQuestionModal = false" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Cancel</button>
+                <button @click="saveQuestion()" class="px-4 py-2 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow">Save Question</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD EBOOK / PAPER -->
+    <div x-show="openAddEbookModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" x-transition.opacity>
+        <div @click.outside="openAddEbookModal = false" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold mb-4">Upload e-Book or Past Paper</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Subject</label>
+                    <select x-model="newEbook.subjectCode" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                        <template x-for="sub in subjects" :key="sub.code">
+                            <option :value="sub.code" x-text="sub.name + ' (' + sub.code + ')'"></option>
+                        </template>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Document Title</label>
+                    <input type="text" x-model="newEbook.title" placeholder="e.g., Physics 5054 Topical Past Papers 2023" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Document Type</label>
+                    <select x-model="newEbook.docType" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none">
+                        <option value="Past Paper">Past Paper</option>
+                        <option value="Marking Scheme">Marking Scheme</option>
+                        <option value="Textbook">Textbook / e-Book</option>
+                        <option value="Revision Notes">Revision Notes</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Select File (PDF / Doc)</label>
+                    <input type="file" @change="handleDocumentFile($event)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-950 file:text-indigo-600 dark:file:text-indigo-400 hover:file:bg-indigo-100 cursor-pointer">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button @click="openAddEbookModal = false" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Cancel</button>
+                <button @click="saveEbook()" class="px-4 py-2 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow">Upload Document</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpine App Logic -->
+    <script>
+        function lspApp() {
+            return {
+                currentTab: 'vault',
+                darkMode: false,
+                profileType: 'school',
+                selectedSubjectFilter: 'ALL',
+                questionSearch: '',
+                openAddQuestionModal: false,
+                openAddEbookModal: false,
+                aiQuery: '',
+                aiAdviceText: 'Focus on high-frequency past paper questions from the last 3 years. Review recurring marking scheme keywords.',
+                
+                subjects: [
+                    { code: '4024', name: 'Mathematics D', category: 'Core', icon: 'fa-solid fa-calculator' },
+                    { code: '5054', name: 'Physics', category: 'Science', icon: 'fa-solid fa-atom' },
+                    { code: '5070', name: 'Chemistry', category: 'Science', icon: 'fa-solid fa-flask' },
+                    { code: '0610', name: 'Biology', category: 'Science', icon: 'fa-solid fa-dna' },
+                    { code: '1123', name: 'English Language', category: 'Languages', icon: 'fa-solid fa-book-open' },
+                    { code: '2210', name: 'Computer Science', category: 'Technology', icon: 'fa-solid fa-laptop-code' }
+                ],
+
+                questions: [],
+                oneLiners: [
+                    { id: 1, subjectCode: '4024', topic: 'Algebra', text: 'Always check if quadratic equations can be factored before using the quadratic formula.', bookmarked: false },
+                    { id: 2, subjectCode: '5054', topic: 'Electricity', text: 'Resistance of an LDR decreases as light intensity increases (LIDAR).', bookmarked: true },
+                    { id: 3, subjectCode: '5070', topic: 'Organic Chemistry', text: 'Alkenes turn aqueous bromine from orange/brown to colourless.', bookmarked: false }
+                ],
+                ebooks: [],
+
+                newQ: { subjectCode: '4024', title: '', year: '', occurrences: 1, image: '', notes: '', linkedPaper: '' },
+                newEbook: { subjectCode: '4024', title: '', docType: 'Past Paper', filename: '' },
+
+                init() {
+                    this.darkMode = localStorage.getItem('lsp_dark') === 'true';
+                    this.profileType = localStorage.getItem('lsp_profile') || 'school';
+                    
+                    const savedQ = localStorage.getItem('lsp_questions');
+                    if (savedQ) this.questions = JSON.parse(savedQ);
+
+                    const savedB = localStorage.getItem('lsp_ebooks');
+                    if (savedB) this.ebooks = JSON.parse(savedB);
+                },
+
+                toggleDarkMode() {
+                    this.darkMode = !this.darkMode;
+                    localStorage.setItem('lsp_dark', this.darkMode);
+                    if (this.darkMode) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                },
+
+                saveProfile() {
+                    localStorage.setItem('lsp_profile', this.profileType);
+                },
+
+                handleImageUpload(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const MAX_WIDTH = 800;
+                            const scaleSize = MAX_WIDTH / img.width;
+                            canvas.width = MAX_WIDTH;
+                            canvas.height = img.height * scaleSize;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            this.newQ.image = canvas.toDataURL('image/jpeg', 0.7);
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                handleDocumentFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.newEbook.filename = file.name;
+                        if (!this.newEbook.title) {
+                            this.newEbook.title = file.name.replace(/\.[^/.]+$/, "");
+                        }
+                    }
+                },
+
+                saveQuestion() {
+                    if (!this.newQ.title) return;
+                    this.questions.unshift({
+                        id: Date.now(),
+                        ...this.newQ
+                    });
+                    localStorage.setItem('lsp_questions', JSON.stringify(this.questions));
+                    this.openAddQuestionModal = false;
+                    this.newQ = { subjectCode: '4024', title: '', year: '', occurrences: 1, image: '', notes: '', linkedPaper: '' };
+                },
+
+                deleteQuestion(id) {
+                    this.questions = this.questions.filter(q => q.id !== id);
+                    localStorage.setItem('lsp_questions', JSON.stringify(this.questions));
+                },
+
+                saveEbook() {
+                    if (!this.newEbook.title) return;
+                    this.ebooks.unshift({
+                        id: Date.now(),
+                        ...this.newEbook
+                    });
+                    localStorage.setItem('lsp_ebooks', JSON.stringify(this.ebooks));
+                    this.openAddEbookModal = false;
+                    this.newEbook = { subjectCode: '4024', title: '', docType: 'Past Paper', filename: '' };
+                },
+
+                deleteEbook(id) {
+                    this.ebooks = this.ebooks.filter(b => b.id !== id);
+                    localStorage.setItem('lsp_ebooks', JSON.stringify(this.ebooks));
+                },
+
+                getSubjectQuestionCount(code) {
+                    return this.questions.filter(q => q.subjectCode === code).length;
+                },
+
+                get filteredQuestions() {
+                    return this.questions.filter(q => {
+                        const matchesSub = this.selectedSubjectFilter === 'ALL' || q.subjectCode === this.selectedSubjectFilter;
+                        const matchesSearch = q.title.toLowerCase().includes(this.questionSearch.toLowerCase()) || q.notes.toLowerCase().includes(this.questionSearch.toLowerCase());
+                        return matchesSub && matchesSearch;
+                    });
+                },
+
+                get filteredOneLiners() {
+                    if (this.selectedSubjectFilter === 'ALL') return this.oneLiners;
+                    return this.oneLiners.filter(item => item.subjectCode === this.selectedSubjectFilter);
+                },
+
+                toggleBookmarkOneLiner(id) {
+                    const item = this.oneLiners.find(i => i.id === id);
+                    if (item) item.bookmarked = !item.bookmarked;
+                },
+
+                generateAiAdvice() {
+                    if (!this.aiQuery) return;
+                    this.aiAdviceText = 'AI Focus Strategy for "' + this.aiQuery + '": Review recent May/June past paper marking schemes and practice 3 structured questions on this topic immediately.';
+                    this.aiQuery = '';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
